@@ -1,0 +1,23 @@
+# Environment variables with credentials
+.env
+
+# Virtual environment
+venv/
+
+# Database files
+*.sqlite3
+*.db
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Generated files
+staticfiles/
+*.pid
+server.log
+
+# IDE files
+.vscode/
+.idea/

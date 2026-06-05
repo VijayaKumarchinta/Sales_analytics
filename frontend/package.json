@@ -1,0 +1,37 @@
+{
+  "name": "sales-analytics-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@vueuse/core": "^10.9.0",
+    "@vueuse/motion": "^2.2.3",
+    "apexcharts": "^5.10.0",
+    "axios": "^1.6.7",
+    "file-saver": "^2.0.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2",
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21",
+    "vue-router": "^4.3.0",
+    "vue3-apexcharts": "^1.11.1",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vue/test-utils": "^2.4.11",
+    "autoprefixer": "^10.4.17",
+    "happy-dom": "^14.12.3",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "vite": "^5.2.0",
+    "vitest": "^1.6.1"
+  }
+}

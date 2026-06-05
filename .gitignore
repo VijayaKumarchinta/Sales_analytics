@@ -1,0 +1,59 @@
+# --- Frontend ---
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+frontend/*.log
+
+# --- Backend (already have backend/.gitignore, but root-level coverage) ---
+backend/.env
+backend/venv/
+backend/__pycache__/
+backend/**/__pycache__/
+backend/*.sqlite3
+backend/*.db
+backend/staticfiles/
+backend/*.pid
+backend/server.log
+
+# --- OS Files ---
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# --- IDE / Editor ---
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# --- Environment ---
+.env
+.env.local
+.env.*.local
+
+# --- Logs ---
+*.log
+npm-debug.log*
+
+# --- Data files (raw CSV source, not code) ---
+sales_analytics_USD.csv
+
+# --- Python ---
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+*.egg
+
+# --- Misc ---
+*.tsbuildinfo
+.eslintcache
