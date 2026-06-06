@@ -7,45 +7,12 @@ Usage:
     python manage.py import_sales_data --csv path/to/file.csv
     python manage.py import_sales_data --clear  # Clear existing data before import
 """
-import csv
 import os
-import random
-from datetime import datetime, timezone
-from decimal import Decimal
 
 from django.conf import settings
 from django.core.management.base import BaseCommand, CommandError
 
-
-from products.models import Product
-from customers.models import Customer
-from sales.models import Sale
-
-
-# Product-to-category mapping
-PRODUCT_CATEGORIES = {
-    'Headphones': 'electronics',
-    'Laptop': 'electronics',
-    'Monitor': 'electronics',
-    'Keyboard': 'electronics',
-    'Smartphone': 'electronics',
-    'Tablet': 'electronics',
-}
-
-# Month name to number mapping
-MONTHS = {
-    'January': 1, 'February': 2, 'March': 3, 'April': 4,
-    'May': 5, 'June': 6, 'July': 7, 'August': 8,
-    'September': 9, 'October': 10, 'November': 11, 'December': 12,
-}
-
-# Region to customer name mapping
-REGION_CUSTOMERS = {
-    'North': {'name': 'Northern Corp', 'email': 'north@example.com', 'city': 'Chicago', 'country': 'USA'},
-    'South': {'name': 'Southern Enterprises', 'email': 'south@example.com', 'city': 'Atlanta', 'country': 'USA'},
-    'East': {'name': 'Eastern Trading Co', 'email': 'east@example.com', 'city': 'New York', 'country': 'USA'},
-    'West': {'name': 'West Coast Solutions', 'email': 'west@example.com', 'city': 'San Francisco', 'country': 'USA'},
-}
+from sales.importers import SalesDataImporter
 
 
 class Command(BaseCommand):
@@ -191,9 +158,14 @@ class Command(BaseCommand):
             total_cost = product.cost_price * units_sold
             profit = revenue - total_cost
 
-            # Parse date: assume all in 2024 for simplicity, use 15th as day
+            # Parse date: use current year so data appears in dashboard lookback windows
+            now = tz_utils.now()
             month_num = MONTHS.get(month_str, 1)
-            order_date = datetime(2024, month_num, 15, 12, 0, 0, tzinfo=timezone.utc)
+            # Distribute across the last 12 months starting from current year
+            year = now.year
+            if month_num > now.month:
+                year -= 1
+            order_date = datetime(year, month_num, 15, 12, 0, 0, tzinfo=timezone.utc)
 
             # Assign a customer - prefer region-based, then random
             if region in customer_cache:

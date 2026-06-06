@@ -16,7 +16,8 @@
             <a href="#features" class="text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-200 transition-colors">Features</a>
             <a href="#demo" class="text-sm font-medium text-surface-500 dark:text-surface-400 hover:text-surface-800 dark:hover:text-surface-200 transition-colors">Demo</a>
             <ThemeToggle />
-            <router-link to="/login" class="btn-primary text-sm py-2 px-5">Get Started</router-link>
+            <router-link to="/dataset/import" class="btn-primary text-sm py-2 px-5">Import Dataset</router-link>
+
           </nav>
           <button class="md:hidden p-2 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-700 text-surface-500 dark:text-surface-400">
             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -55,13 +56,15 @@
               Unlock powerful business insights through intelligent analytics. Monitor performance, identify trends, and make data-driven decisions with enterprise-grade dashboards.
             </p>
             <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-              <router-link to="/login" class="btn-primary text-base px-8 py-3.5 shadow-xl shadow-primary-500/20 hover:shadow-2xl hover:shadow-primary-500/30">
-                Get Started
+              <router-link to="/dataset/import" class="btn-primary text-base px-8 py-3.5 shadow-xl shadow-primary-500/20 hover:shadow-2xl hover:shadow-primary-500/30">
+                Import Dataset
+
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
               </router-link>
               <router-link to="/dashboard" class="btn-secondary text-base px-8 py-3.5">
+
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>

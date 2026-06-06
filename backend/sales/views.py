@@ -12,7 +12,8 @@ from .serializers import SaleSerializer
 class SaleListCreateView(generics.ListCreateAPIView):
     queryset = Sale.objects.select_related('customer', 'product').all()
     serializer_class = SaleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
     filterset_fields = ['region', 'order_date']
     search_fields = ['customer__name', 'product__name']
 
@@ -35,13 +36,15 @@ class SaleListCreateView(generics.ListCreateAPIView):
 class SaleDetailView(generics.RetrieveAPIView):
     queryset = Sale.objects.select_related('customer', 'product').all()
     serializer_class = SaleSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
 
 class SalesTrendView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
+
         period = request.query_params.get('period', 'year')
         now = timezone.now()
 
@@ -81,7 +84,8 @@ class SalesTrendView(APIView):
 
 
 class QuarterlySalesView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
     def get(self, request):
         now = timezone.now()

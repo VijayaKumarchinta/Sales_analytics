@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '@/router'
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
@@ -8,59 +7,15 @@ const api = axios.create({
   }
 })
 
-// Request interceptor to add JWT token
-api.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem('access_token')
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`
-    }
-    return config
-  },
-  (error) => Promise.reject(error)
-)
+// Auth removed: endpoints are public
 
-// Response interceptor for token refresh
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    const originalRequest = error.config
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true
-
-      const refreshToken = localStorage.getItem('refresh_token')
-      if (refreshToken) {
-        try {
-          const { data } = await axios.post('/api/token/refresh/', {
-            refresh: refreshToken
-          })
-          localStorage.setItem('access_token', data.access)
-          originalRequest.headers.Authorization = `Bearer ${data.access}`
-          return api(originalRequest)
-        } catch (refreshError) {
-          localStorage.removeItem('access_token')
-          localStorage.removeItem('refresh_token')
-          router.push('/login')
-          return Promise.reject(refreshError)
-        }
-      } else {
-        localStorage.removeItem('access_token')
-        router.push('/login')
-      }
-    }
-
-    return Promise.reject(error)
-  }
-)
-
-// Auth API
 export const authAPI = {
-  login: (credentials) => api.post('/token/', credentials),
-  register: (data) => api.post('/register/', data),
-  me: () => api.get('/me/'),
-  refresh: (refresh) => api.post('/token/refresh/', { refresh }),
+  login: () => Promise.reject(new Error('Auth disabled')),
+  register: () => Promise.reject(new Error('Auth disabled')),
+  me: () => Promise.reject(new Error('Auth disabled')),
+  refresh: () => Promise.reject(new Error('Auth disabled')),
 }
+
 
 // Dashboard API
 export const dashboardAPI = {

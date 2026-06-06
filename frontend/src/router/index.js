@@ -8,15 +8,16 @@ const routes = [
     meta: { layout: 'landing' }
   },
   {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/pages/LoginPage.vue'),
+    path: '/dataset/import',
+    name: 'DatasetImport',
+    component: () => import('@/pages/DatasetImportPage.vue'),
     meta: { layout: 'landing' }
   },
   {
     path: '/dashboard',
     component: () => import('@/layouts/AppLayout.vue'),
-    meta: { requiresAuth: true },
+    meta: {},
+
     children: [
       {
         path: '',
@@ -70,14 +71,8 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
-  const token = localStorage.getItem('access_token')
-  if (requiresAuth && !token) {
-    next({ name: 'Login' })
-  } else {
-    next()
-  }
-})
+// Auth removed: no guards
+router.beforeEach((to, from, next) => next())
+
 
 export default router

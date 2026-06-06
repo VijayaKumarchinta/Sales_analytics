@@ -10,7 +10,8 @@ from customers.models import Customer
 
 
 class DashboardKPIsView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
     def get(self, request):
         period = request.query_params.get('period', 'year')
@@ -44,14 +45,14 @@ class DashboardKPIsView(APIView):
             # Previous period for comparison
             period_days = (now - start_date).days
             prev_start = start_date - timedelta(days=period_days)
-        previous = Sale.objects.filter(
-            order_date__gte=prev_start,
-            order_date__lt=start_date
-        ).aggregate(
-            revenue=Sum('sales_amount'),
-            profit=Sum('profit'),
-            orders=Count('id'),
-        )
+            previous = Sale.objects.filter(
+                order_date__gte=prev_start,
+                order_date__lt=start_date
+            ).aggregate(
+                revenue=Sum('sales_amount'),
+                profit=Sum('profit'),
+                orders=Count('id'),
+            )
 
         # Customer count
         total_customers = Customer.objects.count()
@@ -96,7 +97,8 @@ class DashboardKPIsView(APIView):
 
 
 class RevenueTrendView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
     def get(self, request):
         from django.db.models.functions import TruncMonth
@@ -126,7 +128,8 @@ class RevenueTrendView(APIView):
 
 
 class SalesByRegionView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
     def get(self, request):
         period = request.query_params.get('period', 'year')
@@ -159,7 +162,8 @@ class SalesByRegionView(APIView):
 
 
 class CategoryBreakdownView(APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.AllowAny]
+
 
     def get(self, request):
         categories = (

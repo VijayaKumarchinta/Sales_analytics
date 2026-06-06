@@ -70,7 +70,7 @@
             <p class="text-xs text-surface-400">Toggle dark mode appearance</p>
           </div>
           <label class="relative inline-flex items-center cursor-pointer">
-            <input type="checkbox" class="sr-only peer" />
+            <input type="checkbox" :checked="themeStore.isDark" @change="themeStore.toggle()" class="sr-only peer" />
             <div class="w-9 h-5 bg-surface-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-primary-500/30 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-surface-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-600"></div>
           </label>
         </div>
@@ -108,8 +108,10 @@
 <script setup>
 import { computed } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useThemeStore } from '@/stores/theme'
 
 const authStore = useAuthStore()
+const themeStore = useThemeStore()
 
 const userInitials = computed(() => {
   return authStore.userName.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2) || 'SA'
