@@ -35,6 +35,17 @@
 - **🌙 Dark/Light Theme** — System-aware dark mode with manual toggle, persisted to localStorage
 - **📱 Responsive Design** — Fully responsive layout for desktop, tablet, and mobile
 
+## 📸 Screenshots
+
+<div align="center">
+  <img src="screenshots/landing.png" alt="Landing Page" width="45%" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin: 8px;"/>
+  <img src="screenshots/login.png" alt="Login Page" width="45%" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin: 8px;"/>
+  <p style="color: #64748b; font-size: 0.9rem; margin-top: 8px;">
+    <strong>Left:</strong> Landing page with hero section, features, and stats
+    • <strong>Right:</strong> Login page with email/password, OAuth buttons, and sign-up toggle
+  </p>
+</div>
+
 ## 🏗️ Tech Stack
 
 **Frontend**
