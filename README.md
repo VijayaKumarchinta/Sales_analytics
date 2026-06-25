@@ -15,7 +15,7 @@
     <img src="https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white" alt="Django"/>
     <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite"/>
     <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"/>
-    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white" alt="Supabase"/>
     <img src="https://img.shields.io/badge/ApexCharts-FF6B35?style=flat&logo=chartdotjs&logoColor=white" alt="ApexCharts"/>
   </p>
 </div>
@@ -31,7 +31,7 @@
 - **📦 Product Performance** — Top/bottom performers, profitability margins, category analysis
 - **🌍 Regional Insights** — Cross-region comparison and growth market identification
 - **📄 Report Exporting** — PDF and CSV export with email scheduling support
-- **🔐 Authentication** — JWT-based auth with role-based access (admin, analyst, viewer)
+- **🔐 Authentication** — Supabase Auth with email/password, Google OAuth, and GitHub OAuth. Role-based access (admin, analyst, viewer).
 - **🌙 Dark/Light Theme** — System-aware dark mode with manual toggle, persisted to localStorage
 - **📱 Responsive Design** — Fully responsive layout for desktop, tablet, and mobile
 
@@ -44,15 +44,15 @@
 - [Vue Router](https://router.vuejs.org/) (Routing with auth guards)
 - [Tailwind CSS](https://tailwindcss.com/) (Utility-first styling)
 - [ApexCharts](https://apexcharts.com/) (Interactive charts via `vue3-apexcharts`)
+- [Supabase JS](https://supabase.com/docs/reference/javascript) (Auth client SDK)
 - [Axios](https://axios-http.com/) (HTTP client with JWT interceptors)
 - [VueUse](https://vueuse.org/) (Composition utilities & motion)
 
 **Backend**
 - [Django](https://www.djangoproject.com/) 5.2 (Python web framework)
 - [Django REST Framework](https://www.django-rest-framework.org/) (REST API)
-- [SimpleJWT](https://django-rest-framework-simplejwt.readthedocs.io/) (JWT authentication)
-- [PostgreSQL](https://www.postgresql.org/) (Production database)
-- [SQLite](https://www.sqlite.org/) (Local development fallback)
+- [Supabase](https://supabase.com/) (Managed PostgreSQL database + Auth)
+- [PostgreSQL](https://www.postgresql.org/) (via Supabase)
 - [Pandas](https://pandas.pydata.org/) (CSV data import)
 - [WhiteNoise](https://whitenoise.readthedocs.io/) (Static file serving)
 
@@ -62,6 +62,7 @@
 - Python 3.11+
 - Node.js 18+
 - npm or pnpm
+- A [Supabase](https://supabase.com) account (free tier works)
 
 ### 1. Clone & Setup
 
@@ -70,10 +71,25 @@ git clone https://github.com/VijayaKumarchinta/Sales_analytics.git
 cd Sales_analytics
 ```
 
-### 2. Backend Setup
+### 2. Supabase Setup
+
+Create a free Supabase project at [supabase.com](https://supabase.com), then copy the following values from your project dashboard:
+
+| Variable | Where to Find It |
+|----------|-----------------|
+| `SUPABASE_URL` | Project Settings → API → Project URL |
+| `SUPABASE_ANON_KEY` | Project Settings → API → Publishable key |
+| `SUPABASE_JWT_SECRET` | Project Settings → API → JWT Settings → JWT Secret |
+| `DATABASE_URL` | Project Settings → Database → Connection string → URI |
+
+### 3. Backend Setup
 
 ```bash
 cd backend
+
+# Copy environment file and fill in your Supabase credentials
+cp .env.example .env
+# Edit .env with your Supabase values
 
 # Create and activate virtual environment
 python -m venv venv
@@ -82,14 +98,11 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run migrations
+# Run migrations (creates tables on your Supabase database)
 python manage.py migrate
 
-# Create a superuser
-python manage.py createsuperuser
-
 # (Optional) Import sample sales data
-python manage.py import_sales_data
+python manage.py import_sales_data --clear
 
 # Start the dev server
 python manage.py runserver
@@ -97,10 +110,14 @@ python manage.py runserver
 
 The API will be available at **http://localhost:8000/api/**.
 
-### 3. Frontend Setup
+### 4. Frontend Setup
 
 ```bash
 cd frontend
+
+# Copy environment file and fill in your Supabase credentials
+cp .env.example .env
+# Edit .env with your Supabase URL and anon key
 
 # Install dependencies
 npm install
@@ -111,26 +128,33 @@ npm run dev
 
 The app will be available at **http://localhost:5173/**.
 
-### 4. Login
+### 5. Login
 
-Use the superuser credentials you created, or the demo account:
-- **Username:** `admin`
-- **Password:** `demo1234`
+Authentication is handled by **Supabase Auth**. You can:
+
+- **Email/Password** — Sign up a new account or sign in with existing credentials
+- **Google OAuth** — Click the Google button (requires OAuth configured in Supabase dashboard)
+- **GitHub OAuth** — Click the GitHub button (requires OAuth configured in Supabase dashboard)
+
+Enable OAuth providers in your Supabase dashboard: **Authentication → Providers → Google / GitHub**
 
 ## 🗄️ Database
 
-The project defaults to **SQLite** for local development. For production, set the following environment variables in `backend/.env`:
+The project uses **Supabase PostgreSQL** in production. Configuration is done via the `DATABASE_URL` environment variable in `backend/.env`:
 
 ```env
-DB_ENGINE=postgresql
-DB_NAME=sales_analytics
-DB_USER=postgres
-DB_PASSWORD=your_password
-DB_HOST=localhost
-DB_PORT=5432
+DATABASE_URL=postgresql://postgres:your-password@db.your-project.supabase.co:5432/postgres
 ```
 
-> If PostgreSQL is not available, the app automatically falls back to SQLite.
+For local development without Supabase, set `DB_ENGINE=sqlite` in `.env` to fall back to SQLite.
+
+## 🔐 Authentication
+
+Authentication is powered by **Supabase Auth**:
+
+- **Backend** validates Supabase JWT tokens via a custom `SupabaseAuthentication` class (`users/authentication.py`). When a user signs in through the frontend, their Supabase JWT is sent to Django, which validates it and maps the user to a local Django `User` record via the `supabase_uid` field.
+- **Frontend** uses the `@supabase/supabase-js` SDK for login, sign-up, password reset, and OAuth. The auth store (`stores/auth.js`) manages session state and auto-refreshes tokens.
+- **Router guards** protect all `/dashboard/*` routes — unauthenticated users are redirected to `/login`.
 
 ## 📊 Data Import
 
@@ -164,18 +188,18 @@ Sales_analytics/
 │   ├── products/         # Product management
 │   ├── reports/          # CSV/PDF export & email
 │   ├── sales/            # Sales data & import command
-│   └── users/            # Custom user model & auth
+│   └── users/            # Custom user model, Supabase auth
 ├── frontend/
 │   ├── src/
 │   │   ├── components/   # Reusable UI components
 │   │   ├── layouts/      # App layout with sidebar
 │   │   ├── pages/        # Page components (9 pages)
 │   │   ├── router/       # Route definitions & guards
-│   │   ├── services/     # Axios API client
+│   │   ├── services/     # Axios API client & Supabase client
 │   │   ├── stores/       # Pinia state stores
 │   │   └── styles/       # Global CSS & Tailwind
 │   └── package.json
-├── sales_analytics_USD.csv  # Sample dataset
+├── sales_analytics_USD.csv  # Sample dataset (gitignored)
 └── README.md
 ```
 
@@ -184,7 +208,7 @@ Sales_analytics/
 | Page | Route | Description |
 |------|-------|-------------|
 | **Landing** | `/` | Marketing homepage with features overview |
-| **Login** | `/login` | Authentication with JWT |
+| **Login** | `/login` | Authentication with Supabase (email/password, Google, GitHub) |
 | **Dashboard** | `/dashboard` | KPI cards, revenue trend, regional bar, category donut |
 | **Sales Analysis** | `/dashboard/sales` | Monthly & quarterly sales trends |
 | **Profit Analysis** | `/dashboard/profit` | Margin & profitability analysis |
@@ -194,20 +218,8 @@ Sales_analytics/
 | **Reports** | `/dashboard/reports` | Export PDF/CSV, email scheduling |
 | **Settings** | `/dashboard/settings` | Account & application settings |
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is for demonstration and educational purposes.
-
 ---
 
 <div align="center">
-  Built with ❤️ using Vue 3, Django, and AI.
+  Built with ❤️ using Vue 3, Django, Supabase, and AI.
 </div>

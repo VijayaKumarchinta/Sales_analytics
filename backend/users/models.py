@@ -1,3 +1,5 @@
+import uuid
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
@@ -9,6 +11,12 @@ class User(AbstractUser):
         ('viewer', 'Viewer'),
     ]
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='viewer')
+    supabase_uid = models.UUIDField(
+        unique=True,
+        null=True,
+        blank=True,
+        help_text='Supabase Auth user UUID for linking with Supabase accounts',
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

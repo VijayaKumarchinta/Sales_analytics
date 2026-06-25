@@ -45,6 +45,7 @@ npm-debug.log*
 
 # --- Data files (raw CSV source, not code) ---
 sales_analytics_USD.csv
+superstore.csv
 
 # --- Python ---
 *.pyc

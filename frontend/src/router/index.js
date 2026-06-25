@@ -8,6 +8,18 @@ const routes = [
     meta: { layout: 'landing' }
   },
   {
+    path: '/login',
+    name: 'Login',
+    component: () => import('@/pages/LoginPage.vue'),
+    meta: { layout: 'landing', guest: true }
+  },
+  {
+    path: '/reset-password',
+    name: 'ResetPassword',
+    component: () => import('@/pages/LoginPage.vue'),
+    meta: { layout: 'landing', guest: true }
+  },
+  {
     path: '/dataset/import',
     name: 'DatasetImport',
     component: () => import('@/pages/DatasetImportPage.vue'),
@@ -16,7 +28,7 @@ const routes = [
   {
     path: '/dashboard',
     component: () => import('@/layouts/AppLayout.vue'),
-    meta: {},
+    meta: { requiresAuth: true },
 
     children: [
       {
@@ -71,8 +83,16 @@ const router = createRouter({
   }
 })
 
-// Auth removed: no guards
-router.beforeEach((to, from, next) => next())
-
+// Auth guard — redirect to login if not authenticated
+router.beforeEach(async (to, from, next) => {
+  if (to.meta.requiresAuth) {
+    const { supabase } = await import('@/services/supabase')
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      return next({ name: 'Login', query: { redirect: to.fullPath } })
+    }
+  }
+  next()
+})
 
 export default router

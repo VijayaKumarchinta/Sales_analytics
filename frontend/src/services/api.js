@@ -4,22 +4,52 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || '/api',
   headers: {
     'Content-Type': 'application/json',
-  }
+  },
 })
 
-// Auth removed: endpoints are public
+// Attach Supabase access token to every request
+api.interceptors.request.use(async (config) => {
+  const { supabase } = await import('@/services/supabase')
+  const { data: { session } } = await supabase.auth.getSession()
+  if (session?.access_token) {
+    config.headers.Authorization = `Bearer ${session.access_token}`
+  }
+  return config
+})
 
+// Handle 401 responses — try refreshing session before redirecting
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401 && !window.location.pathname.includes('/login')) {
+      try {
+        const { supabase } = await import('@/services/supabase')
+        const { data: { session }, error: refreshError } = await supabase.auth.getSession()
+        // If we have a session, maybe it was a stale token — retry the original request
+        if (session && !refreshError) {
+          error.config.headers.Authorization = `Bearer ${session.access_token}`
+          return api.request(error.config)
+        }
+      } catch {
+        // Refresh failed — redirect to login
+      }
+      window.location.href = '/login'
+    }
+    return Promise.reject(error)
+  }
+)
+
+// Auth API — uses Supabase SDK directly (these are placeholders for backward compat)
 export const authAPI = {
-  login: () => Promise.reject(new Error('Auth disabled')),
-  register: () => Promise.reject(new Error('Auth disabled')),
-  me: () => Promise.reject(new Error('Auth disabled')),
-  refresh: () => Promise.reject(new Error('Auth disabled')),
+  login: () => Promise.reject(new Error('Use authStore.login() instead')),
+  register: () => Promise.reject(new Error('Use authStore.signUp() instead')),
+  me: () => api.get('/me/'),
+  refresh: () => Promise.reject(new Error('Use Supabase refresh')),
 }
-
 
 // Dashboard API
 export const dashboardAPI = {
-  kpis: () => api.get('/dashboard/kpis/'),
+  kpis: (params) => api.get('/dashboard/kpis/', { params }),
   revenue: (params) => api.get('/dashboard/revenue/', { params }),
   salesByRegion: (params) => api.get('/dashboard/sales-by-region/', { params }),
   categoryBreakdown: (params) => api.get('/dashboard/category-breakdown/', { params }),

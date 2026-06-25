@@ -44,165 +44,20 @@ class Command(BaseCommand):
 
         self.stdout.write(f'Reading CSV file: {csv_path}')
 
-        if should_clear:
-            self.stdout.write(self.style.WARNING('Clearing existing data...'))
-            Sale.objects.all().delete()
-            Product.objects.all().delete()
-            Customer.objects.all().delete()
-            self.stdout.write(self.style.SUCCESS('Existing data cleared.'))
-
         # Parse CSV
-        rows = []
         with open(csv_path, 'r') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                rows.append(row)
+            rows = SalesDataImporter.parse_csv_rows(f)
 
         self.stdout.write(f'Found {len(rows)} records in CSV')
 
-        # Step 1: Create Products
-        self.stdout.write('\n--- Creating Products ---')
-        products_created = 0
-        product_cache = {}
-
-        unique_products = set(r['Product'].strip() for r in rows)
-        for product_name in unique_products:
-            # Calculate average unit price for this product to set selling_price
-            prices = [
-                Decimal(r['Unit_Price_USD'].strip())
-                for r in rows
-                if r['Product'].strip() == product_name
-            ]
-            avg_price = sum(prices) / len(prices) if prices else Decimal('100.00')
-            cost_price = avg_price * Decimal('0.6')  # Estimate cost as 60% of selling price
-
-            category = PRODUCT_CATEGORIES.get(product_name, 'other')
-
-            product, created = Product.objects.get_or_create(
-                name=product_name,
-                defaults={
-                    'category': category,
-                    'cost_price': cost_price.quantize(Decimal('0.01')),
-                    'selling_price': avg_price.quantize(Decimal('0.01')),
-                    'description': f'{product_name} - imported from sales data',
-                }
-            )
-
-            product_cache[product_name] = product
-            if created:
-                products_created += 1
-                self.stdout.write(f'  Created product: {product.name} ({category})')
-
-        self.stdout.write(self.style.SUCCESS(f'Products: {products_created} created, {len(product_cache)} total'))
-
-        # Step 2: Create Customers (one per region)
-        self.stdout.write('\n--- Creating Customers ---')
-        customers_created = 0
-        customer_cache = {}
-
-        for region, info in REGION_CUSTOMERS.items():
-            customer, created = Customer.objects.get_or_create(
-                email=info['email'],
-                defaults={
-                    'name': info['name'],
-                    'city': info['city'],
-                    'country': info['country'],
-                    'segment': 'Standard',
-                }
-            )
-            customer_cache[region] = customer
-            if created:
-                customers_created += 1
-                self.stdout.write(f'  Created customer: {customer.name} ({region})')
-
-        # Also create a few more random customers for variety
-        extra_customers_data = [
-            {'name': 'Mega Retail Inc', 'email': 'mega@example.com', 'city': 'Dallas', 'country': 'USA', 'segment': 'Premium'},
-            {'name': 'Global Distributors', 'email': 'global@example.com', 'city': 'Seattle', 'country': 'USA', 'segment': 'Premium'},
-            {'name': 'Value Mart', 'email': 'value@example.com', 'city': 'Miami', 'country': 'USA', 'segment': 'Standard'},
-            {'name': 'Corner Shop', 'email': 'corner@example.com', 'city': 'Boston', 'country': 'USA', 'segment': 'Basic'},
-            {'name': 'TechWorld Ltd', 'email': 'techworld@example.com', 'city': 'Austin', 'country': 'USA', 'segment': 'Premium'},
-        ]
-        for info in extra_customers_data:
-            Customer.objects.get_or_create(
-                email=info['email'],
-                defaults={
-                    'name': info['name'],
-                    'city': info['city'],
-                    'country': info['country'],
-                    'segment': info['segment'],
-                }
-            )
-
-        self.stdout.write(self.style.SUCCESS(f'Customers: {Customer.objects.count()} total'))
-
-        # Step 3: Create Sales
-        self.stdout.write('\n--- Creating Sales ---')
-        sales_created = 0
-        batch_size = 200
-        sale_objects = []
-
-        all_customers = list(Customer.objects.all())
-
-        for i, row in enumerate(rows):
-            product_name = row['Product'].strip()
-            region = row['Region'].strip()
-            month_str = row['Month'].strip()
-            units_sold = int(row['Units_Sold'].strip())
-            unit_price = Decimal(row['Unit_Price_USD'].strip())
-            discount_pct = Decimal(row['Discount_%'].strip())
-            revenue = Decimal(row['Revenue_USD'].strip())
-
-            # Calculate cost and profit
-            product = product_cache[product_name]
-            total_cost = product.cost_price * units_sold
-            profit = revenue - total_cost
-
-            # Parse date: use current year so data appears in dashboard lookback windows
-            now = tz_utils.now()
-            month_num = MONTHS.get(month_str, 1)
-            # Distribute across the last 12 months starting from current year
-            year = now.year
-            if month_num > now.month:
-                year -= 1
-            order_date = datetime(year, month_num, 15, 12, 0, 0, tzinfo=timezone.utc)
-
-            # Assign a customer - prefer region-based, then random
-            if region in customer_cache:
-                customer = customer_cache[region]
-            else:
-                customer = random.choice(all_customers)
-
-            sale = Sale(
-                customer=customer,
-                product=product,
-                quantity=units_sold,
-                sales_amount=revenue,
-                profit=profit,
-                discount=discount_pct,
-                region=region,
-                order_date=order_date,
-            )
-            sale_objects.append(sale)
-
-            # Batch create for performance
-            if len(sale_objects) >= batch_size:
-                Sale.objects.bulk_create(sale_objects, ignore_conflicts=True)
-                sales_created += len(sale_objects)
-                self.stdout.write(f'  Created {sales_created} sales records...')
-                sale_objects = []
-
-        # Create remaining
-        if sale_objects:
-            Sale.objects.bulk_create(sale_objects, ignore_conflicts=True)
-            sales_created += len(sale_objects)
-
-        self.stdout.write(self.style.SUCCESS(f'Sales: {sales_created} records created successfully!'))
+        # Import using the reusable importer
+        result = SalesDataImporter.import_from_rows(rows, clear=should_clear)
 
         # Summary
         self.stdout.write('\n' + '=' * 50)
         self.stdout.write(self.style.SUCCESS('IMPORT SUMMARY'))
-        self.stdout.write(f'  Products:  {Product.objects.count()}')
-        self.stdout.write(f'  Customers: {Customer.objects.count()}')
-        self.stdout.write(f'  Sales:     {Sale.objects.count()}')
+        self.stdout.write(f'  Products:  {result.products}')
+        self.stdout.write(f'  Customers: {result.customers}')
+        self.stdout.write(f'  Sales:     {result.sales}')
+        self.stdout.write(f'  CSV rows:  {result.csv_records}')
         self.stdout.write('=' * 50)

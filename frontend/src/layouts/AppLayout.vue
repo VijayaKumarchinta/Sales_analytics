@@ -38,13 +38,17 @@
       <div class="p-4 border-t border-surface-100/50">
         <div class="flex items-center gap-3 px-2">
           <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-primary-400 to-primary-600 flex items-center justify-center text-white text-sm font-bold shadow-md">
-            G
+            {{ userInitials }}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-surface-700 truncate">Guest</p>
-            <p class="text-xs text-surface-400 capitalize">Public</p>
+            <p class="text-sm font-semibold text-surface-700 truncate">{{ userName }}</p>
+            <p class="text-xs text-surface-400 capitalize">{{ userRole }}</p>
           </div>
-          <div class="w-8" />
+          <button @click="handleLogout" class="p-1.5 rounded-lg hover:bg-surface-100 text-surface-400 hover:text-danger-500 transition-colors" title="Sign out">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -151,17 +155,23 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+import { useAuthStore } from '@/stores/auth'
 import { useDashboardStore } from '@/stores/dashboard'
 import ThemeToggle from '@/components/common/ThemeToggle.vue'
 
 const route = useRoute()
+const authStore = useAuthStore()
 
 const dashboardStore = useDashboardStore()
 const mobileSidebarOpen = ref(false)
 const dateRange = ref('year')
 
-const userName = computed(() => 'Guest')
-const userRole = computed(() => 'public')
+const userName = computed(() => authStore.userName)
+const userRole = computed(() => authStore.userRole)
+const userInitials = computed(() => {
+  const name = authStore.userName
+  return name.split(' ').map(n => n.charAt(0)).join('').toUpperCase().slice(0, 2) || '?'
+})
 
 
 const sidebarMotion = {
@@ -231,6 +241,10 @@ const pageSubtitle = computed(() => pageMeta.value.subtitle)
 
 function isActive(path) {
   return route.path === path || route.path.startsWith(path + '/')
+}
+
+function handleLogout() {
+  authStore.logout()
 }
 
 function onDateRangeChange() {
