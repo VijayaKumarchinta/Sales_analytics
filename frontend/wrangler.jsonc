@@ -1,0 +1,11 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicksrandall/wrangler/refs/heads/main/packages/wrangler/config-schema.json",
+  "name": "salesanalytics",
+  "main": "dist/_worker.js",
+  "assets": {
+    "directory": "dist",
+    "binding": "ASSETS"
+  },
+  "compatibility_date": "2026-06-27",
+  "compatibility_flags": ["nodejs_compat"]
+}
