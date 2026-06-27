@@ -52,15 +52,15 @@ import KpiCard from '@/components/common/KpiCard.vue'
 const salesStore = useSalesStore()
 
 const salesKpis = computed(() => [
-  { label: 'Total Revenue', value: salesStore.totalRevenue || 2845000, prefix: '$', type: 'revenue', badge: 12.5 },
-  { label: 'Total Profit', value: salesStore.totalProfit || 856000, prefix: '$', type: 'profit', badge: 8.3 },
-  { label: 'Total Orders', value: salesStore.totalOrders || 15234, type: 'orders', badge: -3.2 },
-  { label: 'Avg Order Value', value: 187, prefix: '$', type: 'margin', badge: 2.1 },
+  { label: 'Total Revenue', value: salesStore.totalRevenue, prefix: '$', type: 'revenue', badge: 12.5 },
+  { label: 'Total Profit', value: salesStore.totalProfit, prefix: '$', type: 'profit', badge: 8.3 },
+  { label: 'Total Orders', value: salesStore.totalOrders, type: 'orders', badge: -3.2 },
+  { label: 'Avg Order Value', value: salesStore.averageOrderValue, prefix: '$', type: 'margin', badge: 2.1 },
 ])
 
 const monthlySeries = computed(() => [
-  { name: 'Revenue', data: salesStore.trends.map(t => t.revenue) || [210000, 195000, 245000, 230000, 268000, 295000, 310000, 285000, 320000, 298000, 342000, 378000] },
-  { name: 'Profit', data: salesStore.trends.map(t => t.profit) || [63000, 58500, 73500, 69000, 80400, 88500, 93000, 85500, 96000, 89400, 102600, 113400] },
+  { name: 'Revenue', data: salesStore.trends.map(t => t.revenue) },
+  { name: 'Profit', data: salesStore.trends.map(t => t.profit) },
 ])
 
 const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -85,8 +85,8 @@ const monthlyChartOptions = computed(() => ({
 }))
 
 const quarterlySeries = computed(() => [
-  { name: 'Revenue', data: salesStore.quarterlyData.map(q => q.revenue) || [650000, 793000, 915000, 1018000] },
-  { name: 'Profit', data: salesStore.quarterlyData.map(q => q.profit) || [195000, 237900, 274500, 305400] },
+  { name: 'Revenue', data: salesStore.quarterlyData.map(q => q.revenue) },
+  { name: 'Profit', data: salesStore.quarterlyData.map(q => q.profit) },
 ])
 
 const quarterlyChartOptions = computed(() => ({

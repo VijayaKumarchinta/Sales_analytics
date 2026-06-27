@@ -2,10 +2,10 @@
   <div class="space-y-6">
     <!-- Customer KPIs -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KpiCard label="Total Customers" :value="4892" type="customers" :badge="15.7" :index="0" />
-      <KpiCard label="Avg Lifetime Value" :value="1240" prefix="$" type="revenue" :badge="8.2" :index="1" />
-      <KpiCard label="Retention Rate" :value="92.3" suffix="%" type="margin" :badge="3.1" :index="2" />
-      <KpiCard label="Churn Rate" :value="7.7" suffix="%" type="growth" :badge="-2.4" :index="3" />
+      <KpiCard label="Total Customers" :value="customerKpis.totalCustomers" type="customers" :badge="15.7" :index="0" />
+      <KpiCard label="Avg Lifetime Value" :value="customerKpis.avgLifetimeValue" prefix="$" type="revenue" :badge="8.2" :index="1" />
+      <KpiCard label="Retention Rate" :value="customerKpis.retentionRate" suffix="%" type="margin" :badge="3.1" :index="2" />
+      <KpiCard label="Churn Rate" :value="customerKpis.churnRate" suffix="%" type="growth" :badge="-2.4" :index="3" />
     </div>
 
     <!-- Charts Row -->
@@ -80,6 +80,18 @@ import KpiCard from '@/components/common/KpiCard.vue'
 const customersStore = useCustomersStore()
 
 const customers = computed(() => customersStore.customers)
+const customerKpis = computed(() => ({
+  totalCustomers: customersStore.totalCustomers,
+  avgLifetimeValue: customersStore.customers.length > 0
+    ? Math.round(customersStore.customers.reduce((sum, c) => sum + Number(c.total_spent || 0), 0) / customersStore.customers.length)
+    : 0,
+  retentionRate: customersStore.retentionData.length > 0
+    ? customersStore.retentionData[customersStore.retentionData.length - 1].rate
+    : 0,
+  churnRate: customersStore.retentionData.length > 0
+    ? Number((100 - customersStore.retentionData[customersStore.retentionData.length - 1].rate).toFixed(1))
+    : 0,
+}))
 
 const segmentSeries = computed(() => customersStore.segments.map(s => s.count))
 const segmentLabels = computed(() => customersStore.segments.map(s => s.name))
@@ -105,7 +117,7 @@ const segmentChartOptions = computed(() => ({
 }))
 
 const retentionSeries = computed(() => [
-  { name: 'Retention Rate', data: customersStore.retentionData.map(r => r.rate) || [92, 88, 94, 90, 91, 93, 89, 95, 92, 91, 94, 96] },
+  { name: 'Retention Rate', data: customersStore.retentionData.map(r => r.rate) },
 ])
 
 const retentionChartOptions = {

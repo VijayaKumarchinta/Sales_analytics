@@ -27,6 +27,9 @@ export const useSalesStore = defineStore('sales', {
     totalRevenue: (state) => state.sales.reduce((sum, s) => sum + Number(s.sales_amount || 0), 0),
     totalProfit: (state) => state.sales.reduce((sum, s) => sum + Number(s.profit || 0), 0),
     totalOrders: (state) => state.sales.length,
+    averageOrderValue: (state) => state.sales.length > 0
+      ? Math.round(state.sales.reduce((sum, s) => sum + Number(s.sales_amount || 0), 0) / state.sales.length)
+      : 0,
     monthlyTrend: (state) => {
       const months = {}
       state.sales.forEach(s => {

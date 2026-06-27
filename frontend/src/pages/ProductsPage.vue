@@ -2,10 +2,10 @@
   <div class="space-y-6">
     <!-- Product KPIs -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      <KpiCard label="Total Products" :value="248" type="revenue" :badge="12.3" :index="0" />
-      <KpiCard label="Avg Profit Margin" :value="56.8" suffix="%" type="profit" :badge="4.5" :index="1" />
-      <KpiCard label="Top Performer" value="Laptop Pro" type="margin" subtext="$1.28M revenue" :index="2" />
-      <KpiCard label="Categories" :value="8" type="orders" :badge="1" :index="3" />
+      <KpiCard label="Total Products" :value="productKpis.totalProducts" type="revenue" :badge="12.3" :index="0" />
+      <KpiCard label="Avg Profit Margin" :value="productKpis.avgMargin" suffix="%" type="profit" :badge="4.5" :index="1" />
+      <KpiCard label="Top Performer" :value="productKpis.topPerformer" type="margin" :subtext="productKpis.topPerformerRevenue" :index="2" />
+      <KpiCard label="Categories" :value="productKpis.categoryCount" type="orders" :badge="1" :index="3" />
     </div>
 
     <!-- Top Products -->
@@ -100,7 +100,17 @@ const productsStore = useProductsStore()
 const products = computed(() => productsStore.products)
 const topProducts = computed(() => productsStore.topProducts)
 
-const categorySeries = computed(() => productsStore.profitabilityData.map(p => Math.round(p.margin)) || [42.5, 64.4, 59.9, 72.1])
+const productKpis = computed(() => ({
+  totalProducts: productsStore.totalProducts,
+  avgMargin: Number(productsStore.averageMargin),
+  topPerformer: productsStore.topProducts.length > 0 ? productsStore.topProducts[0].name : '—',
+  topPerformerRevenue: productsStore.topProducts.length > 0
+    ? `$${(productsStore.topProducts[0].revenue / 1000000).toFixed(2)}M revenue`
+    : '',
+  categoryCount: [...new Set(productsStore.products.map(p => p.category))].length,
+}))
+
+const categorySeries = computed(() => productsStore.profitabilityData.map(p => Math.round(p.margin)))
 
 const categoryChartOptions = computed(() => ({
   chart: { type: 'radialBar', toolbar: { show: false }, fontFamily: 'Inter, sans-serif', foreColor: '#94a3b8', animations: { enabled: true, easing: 'easeinout', speed: 800 } },
@@ -108,12 +118,12 @@ const categoryChartOptions = computed(() => ({
   plotOptions: {
     radialBar: {
       dataLabels: {
-        total: { show: true, label: 'Avg', fontSize: '12px', color: '#94a3b8', formatter: () => '56.8%' },
+        total: { show: true, label: 'Avg', fontSize: '12px', color: '#94a3b8', formatter: () => `${Number(productsStore.averageMargin)}%` },
         value: { fontSize: '14px', fontWeight: 700, formatter: (val) => `${val}%` },
       },
     },
   },
-  labels: productsStore.profitabilityData.map(p => p.category) || ['Electronics', 'Sports', 'Home & Garden', 'Books'],
+  labels: productsStore.profitabilityData.map(p => p.category),
   legend: { position: 'bottom', fontSize: '11px', markers: { size: 6 } },
 }))
 
