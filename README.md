@@ -233,4 +233,6 @@ Sales_analytics/
 
 <div align="center">
   Built with ❤️ using Vue 3, Django, Supabase, and AI.
+  <br><br>
+  <sub>🏠 <a href="https://github.com/VijayaKumarchinta/portfolio">View my complete portfolio</a></sub>
 </div>
