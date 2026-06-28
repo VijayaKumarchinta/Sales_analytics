@@ -46,6 +46,11 @@
     <strong>Left:</strong> Landing page with hero section, features, and stats
     • <strong>Right:</strong> Login page with email/password, OAuth buttons, and sign-up toggle
   </p>
+  <br>
+  <img src="screenshots/dashboard.png" alt="Dashboard Page" width="90%" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin: 8px;"/>
+  <p style="color: #64748b; font-size: 0.9rem; margin-top: 8px;">
+    <strong>Dashboard:</strong> KPI cards, revenue trends, regional performance, and category breakdowns with animated ApexCharts
+  </p>
 </div>
 
 ## 🏗️ Tech Stack
