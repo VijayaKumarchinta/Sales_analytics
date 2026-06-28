@@ -10,6 +10,8 @@
 
   **A full-stack sales analytics platform with interactive dashboards, real-time KPIs, and intelligent reporting.**
 
+  > **📍 Runs locally** — No live demo deployed. Follow the Quick Start guide below to run the app.
+
   <p>
     <img src="https://img.shields.io/badge/Vue_3-4FC08D?style=flat&logo=vue.js&logoColor=white" alt="Vue 3"/>
     <img src="https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white" alt="Django"/>
