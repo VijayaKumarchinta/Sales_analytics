@@ -51,10 +51,26 @@ jobs:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           wranglerVersion: "3.90.0"
           workingDirectory: worker
-          secrets: |
-            JWT_SECRET
-            SALT
           command: deploy
+
+      - name: Set JWT_SECRET
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "3.90.0"
+          workingDirectory: worker
+          command: secret put JWT_SECRET --name sales-analytics-api
         env:
           JWT_SECRET: ${{ secrets.SALES_JWT_SECRET }}
+
+      - name: Set SALT
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          wranglerVersion: "3.90.0"
+          workingDirectory: worker
+          command: secret put SALT --name sales-analytics-api
+        env:
           SALT: ${{ secrets.SALES_SALT }}
