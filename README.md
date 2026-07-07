@@ -13,12 +13,13 @@
   > **📍 Runs locally** — No live demo deployed. Follow the Quick Start guide below to run the app.
 
   <p>
+    <img src="https://img.shields.io/github/actions/workflow/status/VijayaKumarchinta/Sales_analytics/deploy-frontend.yml?branch=main&logo=github&label=Frontend" alt="Frontend Deploy"/>
+    <img src="https://img.shields.io/github/actions/workflow/status/VijayaKumarchinta/Sales_analytics/deploy-worker.yml?branch=main&logo=github&label=API" alt="API Deploy"/>
     <img src="https://img.shields.io/badge/Vue_3-4FC08D?style=flat&logo=vue.js&logoColor=white" alt="Vue 3"/>
-    <img src="https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white" alt="Django"/>
     <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite"/>
     <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"/>
-    <img src="https://img.shields.io/badge/JWT_Auth-000000?style=flat&logo=jsonwebtokens&logoColor=white" alt="JWT Auth"/>
-    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
+    <img src="https://img.shields.io/badge/Cloudflare_Workers-F38020?style=flat&logo=cloudflare&logoColor=white" alt="Cloudflare"/>
+    <img src="https://img.shields.io/badge/D1-FF6B35?style=flat&logo=cloudflare&logoColor=white" alt="D1"/>
     <img src="https://img.shields.io/badge/ApexCharts-FF6B35?style=flat&logo=chartdotjs&logoColor=white" alt="ApexCharts"/>
   </p>
 </div>
