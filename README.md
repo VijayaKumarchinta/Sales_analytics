@@ -17,7 +17,8 @@
     <img src="https://img.shields.io/badge/Django-092E20?style=flat&logo=django&logoColor=white" alt="Django"/>
     <img src="https://img.shields.io/badge/Vite-646CFF?style=flat&logo=vite&logoColor=white" alt="Vite"/>
     <img src="https://img.shields.io/badge/Tailwind_CSS-06B6D4?style=flat&logo=tailwind-css&logoColor=white" alt="Tailwind CSS"/>
-    <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=flat&logo=supabase&logoColor=white" alt="Supabase"/>
+    <img src="https://img.shields.io/badge/JWT_Auth-000000?style=flat&logo=jsonwebtokens&logoColor=white" alt="JWT Auth"/>
+    <img src="https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white" alt="PostgreSQL"/>
     <img src="https://img.shields.io/badge/ApexCharts-FF6B35?style=flat&logo=chartdotjs&logoColor=white" alt="ApexCharts"/>
   </p>
 </div>
@@ -33,7 +34,7 @@
 - **📦 Product Performance** — Top/bottom performers, profitability margins, category analysis
 - **🌍 Regional Insights** — Cross-region comparison and growth market identification
 - **📄 Report Exporting** — PDF and CSV export with email scheduling support
-- **🔐 Authentication** — Supabase Auth with email/password, Google OAuth, and GitHub OAuth. Role-based access (admin, analyst, viewer).
+- **🔐 Authentication** — Django SimpleJWT with email/password login. Role-based access (admin, analyst, viewer). API key auth also supported for programmatic access.
 - **🌙 Dark/Light Theme** — System-aware dark mode with manual toggle, persisted to localStorage
 - **📱 Responsive Design** — Fully responsive layout for desktop, tablet, and mobile
 
@@ -44,7 +45,7 @@
   <img src="screenshots/login.png" alt="Login Page" width="45%" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin: 8px;"/>
   <p style="color: #64748b; font-size: 0.9rem; margin-top: 8px;">
     <strong>Left:</strong> Landing page with hero section, features, and stats
-    • <strong>Right:</strong> Login page with email/password, OAuth buttons, and sign-up toggle
+    • <strong>Right:</strong> Login page with email/password sign-in
   </p>
   <br>
   <img src="screenshots/dashboard.png" alt="Dashboard Page" width="90%" style="border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.1); margin: 8px;"/>
@@ -62,15 +63,14 @@
 - [Vue Router](https://router.vuejs.org/) (Routing with auth guards)
 - [Tailwind CSS](https://tailwindcss.com/) (Utility-first styling)
 - [ApexCharts](https://apexcharts.com/) (Interactive charts via `vue3-apexcharts`)
-- [Supabase JS](https://supabase.com/docs/reference/javascript) (Auth client SDK)
 - [Axios](https://axios-http.com/) (HTTP client with JWT interceptors)
 - [VueUse](https://vueuse.org/) (Composition utilities & motion)
 
 **Backend**
 - [Django](https://www.djangoproject.com/) 5.2 (Python web framework)
 - [Django REST Framework](https://www.django-rest-framework.org/) (REST API)
-- [Supabase](https://supabase.com/) (Managed PostgreSQL database + Auth)
-- [PostgreSQL](https://www.postgresql.org/) (via Supabase)
+- [SimpleJWT](https://django-rest-framework-simplejwt.readthedocs.io/) (JWT authentication)
+- [PostgreSQL](https://www.postgresql.org/) / SQLite (Database)
 - [Pandas](https://pandas.pydata.org/) (CSV data import)
 - [WhiteNoise](https://whitenoise.readthedocs.io/) (Static file serving)
 
@@ -80,7 +80,7 @@
 - Python 3.11+
 - Node.js 18+
 - npm or pnpm
-- A [Supabase](https://supabase.com) account (free tier works)
+- PostgreSQL 16+ (optional — SQLite works out of the box for local dev)
 
 ### 1. Clone & Setup
 
@@ -89,25 +89,10 @@ git clone https://github.com/VijayaKumarchinta/Sales_analytics.git
 cd Sales_analytics
 ```
 
-### 2. Supabase Setup
-
-Create a free Supabase project at [supabase.com](https://supabase.com), then copy the following values from your project dashboard:
-
-| Variable | Where to Find It |
-|----------|-----------------|
-| `SUPABASE_URL` | Project Settings → API → Project URL |
-| `SUPABASE_ANON_KEY` | Project Settings → API → Publishable key |
-| `SUPABASE_JWT_SECRET` | Project Settings → API → JWT Settings → JWT Secret |
-| `DATABASE_URL` | Project Settings → Database → Connection string → URI |
-
-### 3. Backend Setup
+### 2. Backend Setup
 
 ```bash
 cd backend
-
-# Copy environment file and fill in your Supabase credentials
-cp .env.example .env
-# Edit .env with your Supabase values
 
 # Create and activate virtual environment
 python -m venv venv
@@ -116,63 +101,84 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 # Install dependencies
 pip install -r requirements.txt
 
-# Run migrations (creates tables on your Supabase database)
+# Run migrations (creates tables — uses SQLite by default)
 python manage.py migrate
 
 # (Optional) Import sample sales data
 python manage.py import_sales_data --clear
 
+# Seed an admin user for first-time login
+python manage.py seed_admin --username=admin --password=demo1234 --email=admin@example.com
+
 # Start the dev server
 python manage.py runserver
 ```
 
-The API will be available at **http://localhost:8000/api/**.
+The API will be available at **http://localhost:8000/**.
 
-### 4. Frontend Setup
+### 3. Frontend Setup
 
 ```bash
 cd frontend
-
-# Copy environment file and fill in your Supabase credentials
-cp .env.example .env
-# Edit .env with your Supabase URL and anon key
-
-# Install dependencies
 npm install
-
-# Start the dev server
 npm run dev
 ```
 
 The app will be available at **http://localhost:5173/**.
 
-### 5. Login
+### 4. Login
 
-Authentication is handled by **Supabase Auth**. You can:
+Open the app and navigate to **http://localhost:5173/login** and sign in with the credentials you set during seeding. By default:
 
-- **Email/Password** — Sign up a new account or sign in with existing credentials
-- **Google OAuth** — Click the Google button (requires OAuth configured in Supabase dashboard)
-- **GitHub OAuth** — Click the GitHub button (requires OAuth configured in Supabase dashboard)
+- **Username:** `admin`
+- **Password:** `demo1234`
 
-Enable OAuth providers in your Supabase dashboard: **Authentication → Providers → Google / GitHub**
+Or create additional users through the Django admin panel or directly via the API.
 
 ## 🗄️ Database
 
-The project uses **Supabase PostgreSQL** in production. Configuration is done via the `DATABASE_URL` environment variable in `backend/.env`:
+The project supports both **PostgreSQL** and **SQLite**:
+
+- **Local development** (default): SQLite — zero configuration required
+- **Production**: PostgreSQL via environment variables
+
+To switch to PostgreSQL, set these in `backend/.env`:
 
 ```env
-DATABASE_URL=postgresql://postgres:your-password@db.your-project.supabase.co:5432/postgres
+DB_ENGINE=postgresql
+DB_NAME=sales_analytics
+DB_USER=postgres
+DB_PASSWORD=your-password
+DB_HOST=localhost
+DB_PORT=5432
 ```
-
-For local development without Supabase, set `DB_ENGINE=sqlite` in `.env` to fall back to SQLite.
 
 ## 🔐 Authentication
 
-Authentication is powered by **Supabase Auth**:
+Authentication is powered by **Django SimpleJWT** with dual auth support:
 
-- **Backend** validates Supabase JWT tokens via a custom `SupabaseAuthentication` class (`users/authentication.py`). When a user signs in through the frontend, their Supabase JWT is sent to Django, which validates it and maps the user to a local Django `User` record via the `supabase_uid` field.
-- **Frontend** uses the `@supabase/supabase-js` SDK for login, sign-up, password reset, and OAuth. The auth store (`stores/auth.js`) manages session state and auto-refreshes tokens.
-- **Router guards** protect all `/dashboard/*` routes — unauthenticated users are redirected to `/login`.
+- **JWT tokens** — The frontend sends `Authorization: Bearer <token>` with every request. Tokens auto-refresh on 401 responses.
+- **API key auth** — Programmatic clients can use `X-API-Key` header instead of JWT. Both methods work seamlessly.
+- **Token endpoints**:
+  - `POST /api/token/` — Obtain JWT access + refresh tokens (send `username` + `password`)
+  - `POST /api/token/refresh/` — Refresh an expired access token
+  - `GET /api/me/` — Get current user profile (requires authentication)
+- **User roles** — Backend permission classes support role-based access: admin, analyst, viewer.
+- **Router guards** — All `/dashboard/*` routes are protected. Unauthenticated users are redirected to `/login`.
+
+### Seeding an Admin User
+
+```bash
+# Auto-generate password (printed to console)
+python manage.py seed_admin
+
+# Set a specific password
+python manage.py seed_admin --username=admin --password=MySecurePass
+
+# Use environment variable (for production/deployment)
+export ADMIN_PASSWORD=MySecurePass
+python manage.py seed_admin
+```
 
 ## 📊 Data Import
 
@@ -188,10 +194,10 @@ The CSV file (`sales_analytics_USD.csv`) should be placed in the project root di
 ## 🧪 Testing
 
 ```bash
-# Frontend tests (Vitest)
+# Frontend tests (Vitest) — 73+ tests
 cd frontend && npm test
 
-# Backend tests (Django)
+# Backend tests (Django) — 7+ tests
 cd backend && python manage.py test
 ```
 
@@ -201,23 +207,27 @@ cd backend && python manage.py test
 Sales_analytics/
 ├── backend/
 │   ├── analytics/        # Dashboard KPI views
+│   ├── api/              # Shared middleware, error handling, health check
+│   ├── api_auth/         # API key authentication + permissions
 │   ├── config/           # Django settings & URL config
 │   ├── customers/        # Customer management
 │   ├── products/         # Product management
 │   ├── reports/          # CSV/PDF export & email
 │   ├── sales/            # Sales data & import command
-│   └── users/            # Custom user model, Supabase auth
+│   └── users/            # Custom user model, JWT auth
 ├── frontend/
 │   ├── src/
-│   │   ├── components/   # Reusable UI components
+│   │   ├── components/   # Reusable UI components (Toast, KpiCard, etc.)
 │   │   ├── layouts/      # App layout with sidebar
-│   │   ├── pages/        # Page components (9 pages)
-│   │   ├── router/       # Route definitions & guards
-│   │   ├── services/     # Axios API client & Supabase client
+│   │   ├── pages/        # Page components (11 pages)
+│   │   ├── router/       # Route definitions & auth guards
+│   │   ├── services/     # Axios API client with JWT interceptor
 │   │   ├── stores/       # Pinia state stores
 │   │   └── styles/       # Global CSS & Tailwind
 │   └── package.json
-├── sales_analytics_USD.csv  # Sample dataset (gitignored)
+├── render.yaml           # Render deployment config
+├── Procfile              # Render process config
+├── cloudflare-worker.js  # Cloudflare worker for security headers
 └── README.md
 ```
 
@@ -226,7 +236,8 @@ Sales_analytics/
 | Page | Route | Description |
 |------|-------|-------------|
 | **Landing** | `/` | Marketing homepage with features overview |
-| **Login** | `/login` | Authentication with Supabase (email/password, Google, GitHub) |
+| **Dataset Import** | `/dataset/import` | Upload and import CSV sales data |
+| **Login** | `/login` | Sign in with username and password (JWT) |
 | **Dashboard** | `/dashboard` | KPI cards, revenue trend, regional bar, category donut |
 | **Sales Analysis** | `/dashboard/sales` | Monthly & quarterly sales trends |
 | **Profit Analysis** | `/dashboard/profit` | Margin & profitability analysis |
@@ -239,7 +250,7 @@ Sales_analytics/
 ---
 
 <div align="center">
-  Built with ❤️ using Vue 3, Django, Supabase, and AI.
+  Built with ❤️ using Vue 3, Django, SimpleJWT, and AI.
   <br><br>
   <sub>🏠 <a href="https://github.com/VijayaKumarchinta/portfolio">View my complete portfolio</a></sub>
 </div>
