@@ -1,0 +1,56 @@
+# =============================================================================
+# Sales Analytics API Worker — Deploy to Cloudflare Workers
+# =============================================================================
+# Runs on every push to main. Deploys the Worker and applies D1 migrations.
+# Requires CLOUDFLARE_API_TOKEN and Worker secrets set as GitHub secrets.
+# =============================================================================
+
+name: Deploy API Worker
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "worker/**"
+      - ".github/workflows/deploy-worker.yml"
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: worker
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Apply D1 migrations
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: d1 migrations apply sales-db --remote
+
+      - name: Deploy Worker
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          secrets: |
+            JWT_SECRET
+            SALT
+          command: deploy
+        env:
+          JWT_SECRET: ${{ secrets.SALES_JWT_SECRET }}
+          SALT: ${{ secrets.SALES_SALT }}
