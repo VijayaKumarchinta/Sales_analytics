@@ -12,7 +12,7 @@
 
   [![Frontend](https://img.shields.io/github/actions/workflow/status/VijayaKumarchinta/Sales_analytics/deploy-frontend.yml?branch=main&style=for-the-badge&logo=github&label=Frontend)](https://github.com/VijayaKumarchinta/Sales_analytics/actions)
   [![API](https://img.shields.io/github/actions/workflow/status/VijayaKumarchinta/Sales_analytics/deploy-worker.yml?branch=main&style=for-the-badge&logo=github&label=API)](https://github.com/VijayaKumarchinta/Sales_analytics/actions)
-  [![Frontend](https://img.shields.io/badge/FRONTEND-8A2BE2?style=for-the-badge&logo=cloudflare&logoColor=white)](https://sales-analytics.pages.dev)
+  [![Frontend](https://img.shields.io/badge/FRONTEND-8A2BE2?style=for-the-badge&logo=cloudflare&logoColor=white)](https://vijayakumarchinta-sales-analytics.pages.dev)
   [![API](https://img.shields.io/badge/API-8A2BE2?style=for-the-badge&logo=cloudflare&logoColor=white)](https://sales-analytics-api.vijayakumar-chinta15.workers.dev/health)
 
   <p>A full-stack sales analytics platform with interactive dashboards, real-time KPIs, and intelligent reporting — migrated from Django to Cloudflare Workers + D1.</p>
